@@ -12,7 +12,7 @@ fullscreen = 0
 
 # Android specific settings
 android.api = 31
-android.minapi = 21
+android.minapi = 24b
 android.ndk_api = 21
 android.private_storage = True
 
