@@ -1,33 +1,51 @@
-name: Build Priyanshu APK
-on: push
+name: Build APK with Fixed NDK
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+    - name: Checkout Code
+      uses: actions/checkout@v3
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-python: '3.10'
 
-      - name: Install Buildozer Dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y git zip unzip openjdk-17-jdk python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libgdbm-dev libnss3-dev libssl-dev libreadline-dev libffi-dev libsqlite3-dev tk-dev libgdbm-compat-dev libreoffice-dev
-          pip install --user --upgrade buildozer cython virtualenv
+    - name: Install System Dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libsqlite3-dev sqlite3 bzip2 libbz2-dev libssl-dev openssl libgdbm-dev libgdbm-compat-dev liblzma-dev libreadline-dev libncursesw5-dev libffi-dev uuid-dev execstack checkinstall
 
-      - name: Build APK with Buildozer
-        run: |
-          mkdir -p ~/.android
-          touch ~/.android/repositories.cfg
-          yes | buildozer android debug
-        continue-on-error: false
+    - name: Install Buildozer Dependencies
+      run: |
+        pip install --upgrade pip
+        pip install cython==0.29.33 git+https://github.com/kivy/buildozer.git@master python-for-android
 
-      - name: Upload Finished APK Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: Priyanshu-App
-          path: bin/*.apk
+    - name: Manually Download and Setup NDK 25b
+      run: |
+        echo "Downloading fixed NDK 25b..."
+        wget -q https://dl.google.com/android/repository/android-ndk-r25b-linux.zip
+        echo "Unzipping NDK..."
+        unzip -q android-ndk-r25b-linux.zip -d $HOME
+        echo "ANDROID_NDK_HOME=$HOME/android-ndk-r25b" >> $GITHUB_ENV
+        echo "NDK path setup complete!"
 
+    - name: Build APK with Buildozer
+      run: |
+        export ANDROID_NDK_HOME=$HOME/android-ndk-r25b
+        buildozer android debug
+      env:
+        TERM: xterm
+
+    - name: Upload Finished APK Artifact
+      uses: actions/artifacts@v3
+      with:
+        name: Priyanshu-Exploit-APK
+        path: bin/*.apk
