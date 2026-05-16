@@ -1,4 +1,4 @@
-¹[app]
+[app]
 title = Priyanshu App
 package.name = priyanshuapp
 package.domain = org.priyanshu
@@ -10,7 +10,7 @@ requirements = python3,kivy
 orientation = portrait
 fullscreen = 0
 
-# Android specific settings (लाइसेंस एरर फिक्स करने के लिए स्टेबल वर्जन)
+# Android specific settings
 android.api = 31
 android.minapi = 21
 android.ndk_api = 21
