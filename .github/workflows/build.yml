@@ -32,7 +32,7 @@ jobs:
         YES=1 buildozer -v android debug
 
     - name: Upload Finished APK Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: Priyanshu-Core-Kit-APK
         path: bin/*.apk
