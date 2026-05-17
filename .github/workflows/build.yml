@@ -21,12 +21,19 @@ jobs:
     - name: Install System Dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y libsqlite3-dev sqlite3 bzip2 libbz2-dev libssl-dev openssl libgdbm-dev libgdbm-compat-dev liblzma-dev libreadline-dev libncursesw5-dev libffi-dev uuid-dev execstack checkinstall
+        sudo apt-get install -y libsqlite3-dev sqlite3 bzip2 libbz2-dev libssl-dev openssl libgdbm-dev libgdbm-compat-dev liblzma-dev libreadline-dev libncursesw5-dev libffi-dev uuid-dev execstack checkinstall openjdk-17-jdk
 
     - name: Install Buildozer Dependencies
       run: |
         pip install --upgrade pip
         pip install cython==0.29.33 git+https://github.com/kivy/buildozer.git@master python-for-android
+
+    - name: Setup Android SDK Licenses Automatically
+      run: |
+        mkdir -p $HOME/.android
+        touch $HOME/.android/repositories.cfg
+        # गिटहब के कंप्यूटर को पहले ही सारे लाइसेंस एक्सेप्ट करने पर मजबूर करना
+        yes | sdkmanager --licenses || true
 
     - name: Manually Download and Setup NDK 25b
       run: |
@@ -40,7 +47,8 @@ jobs:
     - name: Build APK with Buildozer
       run: |
         export ANDROID_NDK_HOME=$HOME/android-ndk-r25b
-        buildozer android debug
+        # ऑटो-लाइसेंस एक्सेप्ट स्क्रिप्ट को ऑन रखना
+        yes | buildozer android debug
       env:
         TERM: xterm
 
